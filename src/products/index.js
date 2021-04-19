@@ -9,7 +9,7 @@ const route = Router();
 
 const pathToProducts = join(
   dirname(fileURLToPath(import.meta.url)),
-  "../data/products.json"
+  "../jsondata/products.json"
 );
 console.log({ pathToProducts });
 
