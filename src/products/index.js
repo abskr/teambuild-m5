@@ -146,6 +146,7 @@ route.post(
   "/:id/upload",
   multer().single("picture"),
   async (req, res, next) => {
+    console.log("HERE");
     try {
       let productsInDB = await fs.readJSON(pathToProducts);
       const product = productsInDB.find(
