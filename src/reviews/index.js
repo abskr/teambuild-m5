@@ -5,38 +5,43 @@ import {
   getReviews,
   writeReviews,
   getProducts,
+  writeProducts,
 } from "../lib/fs-tools-review.js";
+// import { writeJSON } from "fs-extra";
 
 const router = express.Router();
 
-router.get("/", async (req, res, next) => {
+router.get("/:id", async (req, res, next) => {
   try {
-    const reviews = await getReviews();
-    console.log(req.body);
+    const productsInDB = await getProducts();
+    const product = productsInDB.find(
+      (product) => product.id === req.params.id
+    );
+
+    const reviews = product.reviews;
+    console.log(reviews);
     res.status(200).send(reviews);
   } catch (error) {
     console.log(error);
   }
 });
 
-router.get("/:id", async (req, res, next) => {
-  try {
-    const reviews = await getReviews();
+// router.get("/:id", async (req, res, next) => {
+//   try {
+//     const review = reviews.find((review) => review._id === req.params.id);
 
-    const review = reviews.find((review) => review._id === req.params.id);
+//     if (!review) {
+//       const err = new Error();
+//       err.httpStatusCode = 404;
+//       next(err);
+//     }
 
-    if (!review) {
-      const err = new Error();
-      err.httpStatusCode = 404;
-      next(err);
-    }
-
-    res.send(review);
-  } catch (error) {
-    console.log(error);
-    next(error);
-  }
-});
+//     res.send(review);
+//   } catch (error) {
+//     console.log(error);
+//     next(error);
+//   }
+// });
 
 router.post(
   "/",
@@ -60,14 +65,34 @@ router.post(
         err.httpStatusCode = 400;
         next(err);
       } else {
-        const reviews = await getReviews();
+        // const reviews = await getReviews();
+        const { productId } = req.body;
         const newReview = { ...req.body, _id: uniqid(), createdAt: new Date() };
+        let productsInDB = await getProducts();
+        const product = productsInDB.find(
+          (product) => product.id === productId
+        );
 
-        reviews.push(newReview);
+        if (product) {
+          const productNewObj = {
+            ...product,
+            reviews: [...product.reviews, newReview],
+            updatedAt: new Date(),
+          };
+          productsInDB = productsInDB.filter(
+            (product) => product.id !== productId
+          );
 
-        await writeReviews(reviews);
-
-        res.status(201).send(newReview);
+          productsInDB.push(productNewObj);
+          await writeProducts(productsInDB);
+          res.status(201).send(newReview);
+        } else {
+          const error = new Error({
+            message: `Product with this id is not found`,
+          });
+          error.httpStatusCode = 404;
+          next(error);
+        }
       }
     } catch (error) {
       console.log(error);
@@ -76,37 +101,66 @@ router.post(
   }
 );
 
-router.put("/:id", async (req, res, next) => {
+router.put("/:id/:reviewId", async (req, res, next) => {
   try {
-    const reviews = await getReviews();
+    let productsInDB = await getProducts();
+    let product = productsInDB.find((product) => product.id === req.params.id);
+    if (product) {
+      productsInDB = productsInDB.filter(
+        (product) => product.id !== req.params.id
+      );
+      let reviews = product.reviews;
 
-    const newReviewsArray = reviews.filter(
-      (review) => review._id !== req.params.id
-    );
+      const review = reviews.find(
+        (review) => review.id === req.params.reviewId
+      );
+      reviews = reviews.filter((review) => review._id !== req.params.reviewId);
+      const reviewObj = {
+        ...review,
+        ...req.body,
+        _id: req.params.reviewId,
+        updatedAt: new Date(),
+      };
+      reviews.push(reviewObj);
+      const productNewObj = {
+        ...product,
+        reviews: reviews,
+        updatedAt: new Date(),
+      };
+      productsInDB.push(productNewObj);
+      await writeProducts(productsInDB);
 
-    const modifiedReview = {
-      ...req.body,
-      _id: req.params.id,
-    };
-
-    newReviewsArray.push(modifiedReview);
-    await writeReviews(newReviewsArray);
-
-    res.status(201).send(modifiedReview);
-  } catch (error) {
-    console.log(error);
+      res.status(201).send(reviewObj);
+    } else {
+      const error = new Error({ message: `Product with this id is not found` });
+      error.httpStatusCode = 404;
+      next(error);
+    }
+  } catch (err) {
+    const error = new Error(err.message);
+    error.httpStatusCode = 500;
     next(error);
   }
 });
 
-router.delete("/:id", async (req, res, next) => {
+router.delete("/:id/:reviewId", async (req, res, next) => {
   try {
-    const reviews = await getReviews();
-    const newReviewsArray = reviews.filter(
-      (review) => review._id !== req.params.id
+    let productsInDB = await getProducts();
+    let product = productsInDB.find((product) => product.id === req.params.id);
+
+    let reviews = product.reviews;
+    reviews = reviews.filter((review) => review._id !== req.params.reviewId);
+    const productNewObj = {
+      ...product,
+      reviews: reviews,
+      updatedAt: new Date(),
+    };
+    productsInDB = productsInDB.filter(
+      (product) => product.id !== req.params.id
     );
-    await writeReviews(newReviewsArray);
-    res.status(204).send("its gone");
+    productsInDB.push(productNewObj);
+    await writeProducts(productsInDB);
+    res.status(200).send(reviews);
   } catch (error) {
     console.log(error);
   }

@@ -15,5 +15,8 @@ export const getReviews = async () =>
 export const getProducts = async () =>
   await readJSON(join(pathToJsonData, "products.json"));
 
+export const writeProducts = async (content) =>
+  await writeJSON(join(pathToJsonData, "products.json"), content);
+
 export const writeReviews = async (content) =>
   await writeJSON(join(pathToJsonData, "reviews.json"), content);

@@ -1,12 +1,28 @@
 [
   {
-    "_id": "5d318e1a8541744830bef139",
-    "name": "3310",
-    "description": "somthing longer",
-    "brand": "nokia",
-    "price": 100,
-    "category": "smartphones",
-    "createdAt": "2019-07-19T09:32:10.535Z",
-    "updatedAt": "2019-07-19T09:32:10.535Z"
+    "name": "Charger",
+    "description": "some long text to make it look like a description",
+    "brand": "Xiaomi",
+    "imageUrl": "http://localhost:3001/profile.png",
+    "price": 90,
+    "id": "1rzgsrjk1sknogrpmj",
+    "reviews": [
+      {
+        "comment": "Random review 2",
+        "rate": 3,
+        "productId": "1rzgsrjk1sknogrpmj",
+        "_id": "1rzgsrj7g8knoitlxz",
+        "createdAt": "2021-04-19T11:34:38.423Z"
+      },
+      {
+        "comment": "Random review for second product",
+        "rate": 3,
+        "productId": "1rzgsrjk1sknogrpmj",
+        "_id": "1rzgsrj7g8knoivu6f",
+        "createdAt": "2021-04-19T11:36:22.407Z"
+      }
+    ],
+    "createdAt": "2021-04-19T10:37:10.650Z",
+    "updatedAt": "2021-04-19T12:22:55.714Z"
   }
 ]

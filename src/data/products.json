@@ -1,1 +1,13 @@
-[{"name":"Charger","description":"some long text to make it look like a description","brand":"Xiaomi","imageUrl":"http://localhost:3001/profile.png","price":90,"id":"1rzgsrjk1sknogrpmj","reviews":[],"createdAt":"2021-04-19T10:37:10.650Z","updatedAt":"2021-04-19T10:59:44.040Z"}]
+[
+  {
+    "name": "Charger",
+    "description": "some long text to make it look like a description",
+    "brand": "Xiaomi",
+    "imageUrl": "http://localhost:3001/profile.png",
+    "price": 90,
+    "id": "1rzgsrjk1sknogrpmj",
+    "reviews": [],
+    "createdAt": "2021-04-19T10:37:10.650Z",
+    "updatedAt": "2021-04-19T10:59:44.040Z"
+  }
+]
