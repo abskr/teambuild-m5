@@ -18,10 +18,25 @@ const pathToPublicImages = join(
   "../../public/img"
 );
 
+console.log({ pathToPublicImages });
+
 route.get("/", async (req, res, next) => {
   try {
     const products = await fs.readJSON(pathToProducts);
     res.status(200).send(products);
+  } catch (err) {
+    const error = new Error(err.message);
+    error.httpStatusCode = 500;
+    next(error);
+  }
+});
+
+route.get("/:name", async (req, res, next) => {
+  try {
+    const pathToPicture = join(pathToPublicImages, req.params.name);
+    const picture = await fs.readFile(pathToPicture);
+    res.attachment(req.params.name);
+    res.send(picture);
   } catch (err) {
     const error = new Error(err.message);
     error.httpStatusCode = 500;
@@ -133,16 +148,21 @@ route.post(
   async (req, res, next) => {
     try {
       let productsInDB = await fs.readJSON(pathToProducts);
-      const product = products.find((product) => product.id === req.params.id);
+      const product = productsInDB.find(
+        (product) => product.id === req.params.id
+      );
       if (product) {
         const pathToPicture = join(pathToPublicImages, req.file.originalname);
-        await fs.writeFile(pathToPicture, req.file.buffer);
 
+        await fs.writeFile(pathToPicture, req.file.buffer);
         const productObj = {
           ...product,
-          imageUrl: `${req.protocol}://${req.hostname}:${process.env.PORT}/img/${originalname}`,
+          imageUrl: `${req.protocol}://${req.hostname}:${process.env.PORT}/${req.file.originalname}`,
           updatedAt: new Date(),
         };
+        productsInDB = productsInDB.filter(
+          (product) => product.id !== req.params.id
+        );
 
         productsInDB.push(productObj);
         await fs.writeJSON(pathToProducts, productsInDB);
