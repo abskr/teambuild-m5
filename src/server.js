@@ -18,12 +18,12 @@ const loggerMiddleware = (req, res, next) => {
 
 const pathToPublic = join(dirname(fileURLToPath(import.meta.url), "../public/img"))
 
-server.use(express.static(pathToPublic))
-server.use(cors())
-server.use(express.json())
+server.use(express.static(pathToPublic));
+server.use(cors());
+server.use(express.json());
 
-server.use("/products", productsRoute)
-server.use("/products/reviews", reviewsRoute)
+server.use("/products", productsRoute);
+// server.use("/products/reviews", reviewsRoute)
 
 //ERROR HANDLERS
 server.use(error404Handler)
