@@ -23,7 +23,17 @@ console.log({ pathToPublicImages });
 route.get("/", async (req, res, next) => {
   try {
     const products = await fs.readJSON(pathToProducts);
-    res.status(200).send(products);
+    if( req.query && req.query.category) {
+      const filteredProducts = products.filter(product => product.hasOwnProperty("category") && product.category === req.query.category)
+      if (!filteredProducts) {
+        const err = new Error("This category not found!")
+        err.htmlStatusCode = 404
+        next(err)
+      }
+      res.status(200).send(products)
+    } else {
+      res.status(200).send(products);
+    }
   } catch (err) {
     const error = new Error(err.message);
     error.httpStatusCode = 500;
