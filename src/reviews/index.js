@@ -26,23 +26,6 @@ router.get("/:id", async (req, res, next) => {
   }
 });
 
-// router.get("/:id", async (req, res, next) => {
-//   try {
-//     const review = reviews.find((review) => review._id === req.params.id);
-
-//     if (!review) {
-//       const err = new Error();
-//       err.httpStatusCode = 404;
-//       next(err);
-//     }
-
-//     res.send(review);
-//   } catch (error) {
-//     console.log(error);
-//     next(error);
-//   }
-// });
-
 router.post(
   "/",
   [
@@ -101,13 +84,15 @@ router.post(
   }
 );
 
-router.put("/:id/:reviewId", async (req, res, next) => {
+router.put("/:reviewId", async (req, res, next) => {
   try {
     let productsInDB = await getProducts();
-    let product = productsInDB.find((product) => product.id === req.params.id);
+    let product = productsInDB.find(
+      (product) => product.id === req.body.productId
+    );
     if (product) {
       productsInDB = productsInDB.filter(
-        (product) => product.id !== req.params.id
+        (product) => product.id !== req.body.productId
       );
       let reviews = product.reviews;
 
@@ -143,10 +128,12 @@ router.put("/:id/:reviewId", async (req, res, next) => {
   }
 });
 
-router.delete("/:id/:reviewId", async (req, res, next) => {
+router.delete("/:reviewId", async (req, res, next) => {
   try {
     let productsInDB = await getProducts();
-    let product = productsInDB.find((product) => product.id === req.params.id);
+    let product = productsInDB.find(
+      (product) => product.id === req.body.productId
+    );
 
     let reviews = product.reviews;
     reviews = reviews.filter((review) => review._id !== req.params.reviewId);
@@ -156,7 +143,7 @@ router.delete("/:id/:reviewId", async (req, res, next) => {
       updatedAt: new Date(),
     };
     productsInDB = productsInDB.filter(
-      (product) => product.id !== req.params.id
+      (product) => product.id !== req.body.productId
     );
     productsInDB.push(productNewObj);
     await writeProducts(productsInDB);
