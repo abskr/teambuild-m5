@@ -4,6 +4,7 @@ import cors from 'cors'
 import productsRoute from "./products/index.js"
 import reviewsRoute from "./reviews/index.js"
 import {join, dirname} from 'path'
+
 import {
   error404Handler, error401Handler, error403Handler, genericErrorHandler
 } from "./middlewares/errorHandler.js"

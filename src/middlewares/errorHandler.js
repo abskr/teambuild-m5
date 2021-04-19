@@ -1,3 +1,10 @@
+export const error400Handler = (err, req, res, next) => {
+  if (err.httpStatusCode === 404) {
+    res.status(400).send("Bad request!")
+  }
+  next(err)
+}
+
 export const error404Handler = (err, req, res, next) => {
   if (err.httpStatusCode === 404){
     res.status(404).send("page not found!")
