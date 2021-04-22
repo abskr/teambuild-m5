@@ -4,8 +4,10 @@ import { join, dirname } from "path";
 import fs from "fs-extra";
 import uniqid from "uniqid";
 import multer from "multer";
+import { pipeline } from "stream"
+import { Transform } from "json2csv"
 
-const route = Router();
+const router = Router();
 
 const pathToProducts = join(
   dirname(fileURLToPath(import.meta.url)),
@@ -20,7 +22,7 @@ const pathToPublicImages = join(
 
 console.log({ pathToPublicImages });
 
-route.get("/", async (req, res, next) => {
+router.get("/", async (req, res, next) => {
   try {
     const products = await fs.readJSON(pathToProducts);
     if( req.query && req.query.category) {
@@ -41,7 +43,28 @@ route.get("/", async (req, res, next) => {
   }
 });
 
-route.get("/:name", async (req, res, next) => {
+router.get('/exportToCSV', (req, res, next) => {
+  try {
+    const fields = ['name', 'brand', 'description', 'price']
+    const opts = {
+      fields
+    }
+    const json2csv = new Transform(opts)
+    res.setHeader("Content-Disposition", "attachment; filename=export.csv")
+    const products = fs.createReadStream(pathToProducts)
+    pipeline(products, json2csv, res, err => {
+      if (err) {
+        console.log(err)
+        next(err)
+      }
+    })
+  } catch (error) {
+    console.log(error)
+    next(error)
+  }
+})
+
+router.get("/:name", async (req, res, next) => {
   try {
     const pathToPicture = join(pathToPublicImages, req.params.name);
     const picture = await fs.readFile(pathToPicture);
@@ -54,7 +77,7 @@ route.get("/:name", async (req, res, next) => {
   }
 });
 
-route.get("/:id", async (req, res, next) => {
+router.get("/:id", async (req, res, next) => {
   try {
     const productsInDB = await fs.readJSON(pathToProducts);
     const product = productsInDB.find(
@@ -74,7 +97,7 @@ route.get("/:id", async (req, res, next) => {
   }
 });
 
-route.post("/", async (req, res, next) => {
+router.post("/", async (req, res, next) => {
   try {
     let productsInDB = await fs.readJSON(pathToProducts);
     const newProductObj = {
@@ -94,7 +117,7 @@ route.post("/", async (req, res, next) => {
   }
 });
 
-route.put("/:id", async (req, res, next) => {
+router.put("/:id", async (req, res, next) => {
   try {
     let productsInDB = await fs.readJSON(pathToProducts);
     const product = productsInDB.find(
@@ -126,7 +149,7 @@ route.put("/:id", async (req, res, next) => {
   }
 });
 
-route.delete("/:id", async (req, res, next) => {
+router.delete("/:id", async (req, res, next) => {
   try {
     let productsInDB = await fs.readJSON(pathToProducts);
     const product = productsInDB.find(
@@ -152,7 +175,7 @@ route.delete("/:id", async (req, res, next) => {
   }
 });
 
-route.post(
+router.post(
   "/:id/upload",
   multer().single("picture"),
   async (req, res, next) => {
@@ -193,4 +216,6 @@ route.post(
   }
 );
 
-export default route;
+
+
+export default router;

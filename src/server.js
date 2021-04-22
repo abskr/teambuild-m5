@@ -38,7 +38,7 @@ server.use(error401Handler);
 server.use(error403Handler);
 server.use(genericErrorHandler);
 
-// console.log(listEndpoints(server));
+console.log(listEndpoints(server));
 
 server.listen(port, () => console.log("Server is running on port: ", port));
 server.on("error", (error) => console.log("Server is not running. ", error));
